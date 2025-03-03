@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokemon</title>
+    <style>
+      body {
+        margin :0;
+      }
+     section {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      background-color: #f2f3fc; 
+      padding: 10px;
+      border-radius: 15px;
+      box-shadow: 8px 7px 16px #5644444f ;
+     
+      
+     }
+      select {
+        width: 150px;
+        height: 40px;
+        border-radius: 10px;
+        font-family: "Arial Narrow Bold", sans-serif;
+        color: #ffd54f;
+        text-transform:uppercase;
+        font-weight: 700;
+        font-style: oblique;
+        border-color: #ffd54f;
+      }
+      input {
+        width: 150px;
+        height: 30px;
+        border-radius: 10px;
+        font-family: "Arial Narrow Bold", sans-serif;
+        color: rgb(132, 109, 95);
+        font-weight: 700;
+        font-style: oblique;
+        border-color: #ffd54f;
+      }
+      button {
+        width: 80px;
+        height: 40px;
+        border-radius: 20px;
+        font-family: "Arial Narrow Bold", sans-serif;
+        color: #d4c165;
+        text-transform:uppercase;
+        font-weight: 700;
+        font-style: oblique;
+        border-color: #ffd54f;
+        
+      }
+      .box-cerca, .box-type {
+       display: flex;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        padding: 20px;
+        row-gap: 20px;
+      }
+      .card {
+        /* background-color: rgb(170, 217, 133);  */
+        max-width: 150px;
+        min-width: 100px;
+        max-height: 300px;
+        border: 10px solid rgba(182, 178, 178, 0.637);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      img {
+        width: 100px;
+        height: 100px;
+        border: 5px solid rgba(182, 178, 178, 0.637);
+        border-radius: 10px;
+        background-color: rgba(217, 254, 208, 0.845);
+      }
+      h1 {
+        text-transform: capitalize;
+        font-size: 25px;
+        margin: 1px;
+        font-family: "Arial Narrow Bold", sans-serif;
+        color: rgb(97, 79, 79);
+      }
+      p {
+        font-style: oblique;
+        font-weight: 600;
+        color: rgb(12, 95, 237);
+        border: 2px solid;
+        padding: 3px;
+        border-radius: 10px;
+        max-width: 100px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+   <div class="box-type">
+    <input
+      type="text"
+      class="type"
+      id="type"
+      placeholder="questo è un placeholder"
+      value="grass"
+    />
+    <button id="btn-type">Cerca tipo</button>
+  </div>   
+  <div class="box-cerca">
+    <input
+      type="text"
+      class="pokemon"
+      id="pokemon"
+      placeholder="questo è un placeholder"
+      value="ditto"
+    />
+    <button id="btn">Cerca</button>
+  </div>
+    <button id="btn-order">Ordina a-z</button>
+    <select id="sel"></select>
+  </section>
+    <div class="container"></div>
+
+    <script src="pokenew.js"></script>
+  </body>
+</html>

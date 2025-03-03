@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signore degli anelli</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-image: url("https://cdn.suwalls.com/wallpapers/movies/lord-of-the-rings-41474-1920x1080.jpg");
+            background-size: cover;
+            align-items: center;
+        }
+        .conteiner {
+            margin: 50px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            max-width: 200px;
+            padding: 10px;
+            border: 8px solid #c1aa50;
+            border-radius: 5px;
+            background-color: rgb(146 170 164);
+            align-items: center;
+        }
+        .info {
+            color: #6a4a14;
+            background-color: rgb(42 53 62 / 18%);
+            padding: 2px 9px;
+        }
+        .card h1 {
+            margin: 10px;
+            margin-top: 0px;
+            color: #0d4366;
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-style: italic;
+        }
+
+        .info p {
+            margin: 1px;
+        }
+        .img-pers {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 2px solid #c1aa50;
+            border-radius: 5px ;
+        }
+        .barra {
+            max-width: 150px;
+            height: 35px;
+            max-width: 300px;
+            color: #c1aa50;
+            font-size: 20px;
+            font-style: italic;
+        }
+        .btn {
+            max-width: 80px;
+            height: 40px;
+            background-color: transparent;
+            color: #c1aa50;
+            border: 3px solid #c1aa50;
+            font-size: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="divCerca">
+    <input type="text" class="barra" placeholder="Cerca personaggio" value="Frodo Baggins">
+    <button class="btn">Cerca</button>
+    </div>
+    <section class="conteiner">
+    </section>
+
+    <script>
+        
+        const btn = document.querySelector(".btn")
+        const input = document.querySelector(".barra")
+     async function recuperoDati(name) {
+        try {
+            const response = await fetch(`https://lotrapi.co/api/v1/characters`);
+            const result = await response.json()
+            console.log(result)
+            const dataBase = result.results
+            console.log(dataBase)
+            const personaggio = dataBase.find((x) => x.name === name)
+            console.log(personaggio)
+            creaCard(personaggio)
+
+        } catch (error) {
+            console.error(error)
+        }
+     }
+     
+    
+    async function creaCard(personaggio){
+        const immaginiPersonaggi = {
+            "Frodo Baggins": "https://tolkiengateway.net/w/images/thumb/d/dd/Matt_Stewart_-_Frodo_Baggins.webp/750px-Matt_Stewart_-_Frodo_Baggins.webp.png",
+            "Gandalf": "https://tolkiengateway.net/w/images/thumb/4/42/Matt_Stewart_-_Gandalf_-_A_Light_in_the_Dark.jpg/800px-Matt_Stewart_-_Gandalf_-_A_Light_in_the_Dark.jpg",
+            'Bilbo Baggins':"https://tolkiengateway.net/w/images/thumb/d/de/Andrea_Piparo_-_Bilbo_in_Rivendell.jpg/800px-Andrea_Piparo_-_Bilbo_in_Rivendell.jpg",
+            "Aragorn II": "https://tolkiengateway.net/w/images/thumb/6/6e/Yulia_Alekseeva_-_Aragorn_in_Rivendell.jpg/480px-Yulia_Alekseeva_-_Aragorn_in_Rivendell.jpg",
+            "Legolas": "https://i.pinimg.com/736x/fc/8c/a1/fc8ca1087e069ab178188b3e3e7b0c3e.jpg",
+            "Gimli": "https://tolkiengateway.net/w/images/thumb/6/6f/Matt_Stewart_-_Forty-Two.jpg/480px-Matt_Stewart_-_Forty-Two.jpg",
+            "Samwise Gamgee": "https://tolkiengateway.net/w/images/thumb/c/c6/Nia_Kovalevski_-_Sam.jpg/1024px-Nia_Kovalevski_-_Sam.jpg",
+            "Meriadoc Brandybuck": "https://tolkiengateway.net/w/images/thumb/6/61/Jenny_Dolfen_-_Master_Holbytla.jpg/480px-Jenny_Dolfen_-_Master_Holbytla.jpg",
+            "Peregrin Took": "https://tolkiengateway.net/w/images/thumb/2/2b/Campbell_White_-_Peregrin_Took.jpg/480px-Campbell_White_-_Peregrin_Took.jpg",
+            "Boromir": "https://tolkiengateway.net/w/images/thumb/c/c0/Catherine_Karina_Chmiel_-_Son_of_Gondor.jpg/480px-Catherine_Karina_Chmiel_-_Son_of_Gondor.jpg",
+            
+        };
+        
+        const card = document.createElement("div")
+        card.classList.add("card")
+        const nome = document.createElement("h1")
+        const razza = document.createElement("p")
+        const armi =  document.createElement("p")
+        const dataNascita = document.createElement("p")
+        nome.textContent = `${personaggio.name}`
+        const divImg = document.createElement("div")
+        const img = document.createElement("img");
+        img.classList.add("img-pers");
+        img.src = immaginiPersonaggi[personaggio.name]; 
+        divImg.appendChild(img);
+        const info = document.createElement("div");
+        info.setAttribute("class", "info")
+        const fetchRazza = await fetch(personaggio.race)
+        const resultRazza = await fetchRazza.json()
+        razza.textContent = `Razza : ${resultRazza.name}`
+        armi.textContent = `Armi : ${personaggio.weapons.join(", ")}`
+        dataNascita.textContent = `Data di nascita : ${personaggio.date_of_birth}`
+        card.appendChild(nome)
+        card.appendChild(divImg)
+        info.appendChild(razza)
+        info.appendChild(armi)
+        info.appendChild(dataNascita)
+        card.appendChild(info)
+        const conteiner = document.querySelector(".conteiner")
+        conteiner.appendChild(card)
+        }
+      
+     btn.addEventListener("click", () => {
+        const personaggio = input.value;
+        recuperoDati(personaggio)
+     })   
+
+    </script>
+</body>
+</html> 
