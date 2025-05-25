@@ -1,4 +1,4 @@
-import morgan from 'morgan';
+const morgan = require('morgan');
 import  "express-async-errors"
 import express from 'express';
 import { getAll, getOneById, create, updateById, deleteById } from './controllers/planets';

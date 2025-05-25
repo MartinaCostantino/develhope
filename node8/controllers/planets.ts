@@ -1,17 +1,31 @@
 import express, { Request, Response } from 'express';
 import joi from 'joi';
+import pgPromise from 'pg-promise' ;
 
-type Planet = {
-  id: number;
-  name: string;
-};
-
-type Planets = Planet[];
-
-let planets: Planets = [
-  { id: 1, name: 'Earth' },
-  { id: 2, name: 'Mars' },
-];
+// const db = pgPromise()("postgres://postgres:postgres@localhost:5432/postgres");
+const dataBase = pgPromise();
+const db = dataBase({
+  host: "localhost",
+  port: 5432,
+  database: "postgres",
+  user: "postgres",
+  password: "postgres",
+});
+ 
+const setupDatabase = async () => {
+  db.none(`
+    CREATE TABLE IF NOT EXISTS planets (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL
+      );
+      `)
+      await db.none(`INSERT INTO planets (name) VALUES ('Earth')`)
+      await db.none(`INSERT INTO planets (name) VALUES ('Mars')`)
+    }
+    
+    setupDatabase().catch((error) => {
+      console.error('Error setting up database:', error);
+    });
 
 const planetSchema = joi.object({
    id: joi.number().integer().required(),
@@ -19,55 +33,61 @@ const planetSchema = joi.object({
   
 })
 
-const getAll =  (req: Request, res: Response ) => {
-  res.status(200).json({ planets });
+const getAll = async (req: Request, res: Response ) => {
+  try{
+    const planets = await db.any('SELECT * FROM planets');
+    res.status(200).json({ planets });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
 };
 
-const getOneById =(req: Request, res: Response ) => {
+const getOneById = async(req: Request, res: Response ) => {
   const {id} = req.params;
-  const planet = planets.find((planet) => planet.id === Number(id));
-  if (!planet) {
-    return res.status(404).json({ message: 'Planet not found' })
-    }  ;
+  try{
+  const planet = await db.one('SELECT * FROM planets WHERE id = $1', [Number(id)]);
   return res.status(200).json({ planet });
+  } catch (error) {
+    return res.status(404).json({ message: 'Planet not found', error: error.message})
+    }  ;
 }
 
-const create = (req: Request, res: Response) => {
+const create = async (req: Request, res: Response) => {
   const {name, id} = req.body;
-  const planet: Planet = { id, name };
-   const validatetePlanet = planetSchema.validate(planet);
-   if (validatetePlanet.error) {
-    return res.status(400).json({ message: validatetePlanet.error.details[0].message });
-   }else {
-    planets = [...planets, planet]
-   res.status(201).json({ planet });
+  try{
+  const planet = { id, name };
+  const validatetePlanet = planetSchema.validate(planet);
+  if (validatetePlanet.error) {
+  return res.status(400).json({ message: validatetePlanet.error.details[0].message });
+  }
+  await db.none('INSERT INTO planets (name) VALUES ($1)', [name]);
+    res.status(201).json({ planet });
+   } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error', error: error.message })
+   }
 }
-}
-const updateById = (req: Request, res: Response) => {
+
+const updateById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
+  try{
   const { error, value } = planetSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  const planetExists = planets.some(p => p.id === Number(id));
-  if (!planetExists) {
-    return res.status(404).json({ message: 'Planet not found' });
-  }
-   planets = planets.map(p =>
-    p.id === Number(id) ? { ...p, name: value.name } : p
-  );
+ await db.none('UPDATE planets SET name=$2 WHERE id=$1;', [id, name]);
   res.status(200).json({ message: 'Planet updated successfully' });
-
+} catch(error){
+   res.status(500).json({ message: 'Internal Server Error', error: error.message }) 
 }
-const deleteById =  (req: Request, res: Response) => {
+}
+const deleteById =  async (req: Request, res: Response) => {
   const { id } = req.params;
-  const planetExists = planets.find(p => p.id === Number(id));
-  if (!planetExists) {
-   return res.status(404).json({ message: 'Planet not found' });
+ try {
+   await db.none(`DELETE FROM planets WHERE id=$1`, [id]);
+   return res.status(200).json({ message: 'Planet deleted successfully' });
+ } catch (error) {
+   res.status(404).json({ message: error.message });
  }
-  planets = planets.filter((planet) => planet.id !== Number(id));
-  return res.status(200).json({ message: 'Planet deleted successfully' });
 }
-
 export { getAll, getOneById, create, updateById, deleteById } 
