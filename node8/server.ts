@@ -1,10 +1,19 @@
 const morgan = require('morgan');
 import  "express-async-errors"
 import express from 'express';
-import { getAll, getOneById, create, updateById, deleteById } from './controllers/planets';
+import { getAll, getOneById, create, updateById, deleteById, createImage } from './controllers/planets';
 import joi from 'joi';
+import multer from 'multer';
 
-
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+})
+const upload = multer({storage}) 
 const app = express();
 const PORT = 3000;
 
@@ -22,7 +31,7 @@ app.put('/planets/:id', updateById )
 
 app.delete('/planets/:id', deleteById)
 
-
+app.post('/planets/upload/:id/image',upload.single("image") ,createImage)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

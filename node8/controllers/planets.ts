@@ -16,7 +16,8 @@ const setupDatabase = async () => {
   db.none(`
     CREATE TABLE IF NOT EXISTS planets (
       id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL
+      name TEXT NOT NULL,
+      image TEXT
       );
       `)
       await db.none(`INSERT INTO planets (name) VALUES ('Earth')`)
@@ -90,4 +91,16 @@ const deleteById =  async (req: Request, res: Response) => {
    res.status(404).json({ message: error.message });
  }
 }
-export { getAll, getOneById, create, updateById, deleteById } 
+
+ const createImage = async (req: Request, res: Response) => {
+   console.log("req.file:", req.file); 
+  const { id } = req.params;
+  const fileName = req.file?.path;
+  if (fileName) {
+    db.none('UPDATE planets SET image=$2 WHERE id=$1;', [id, fileName])
+    res.status(201).json({ message: 'Planet image uploaded successfully'})
+  } else{
+    res.status(400).json({ message: 'Planet image upload failed' });
+  }
+ }
+export { getAll, getOneById, create, updateById, deleteById, createImage } 
