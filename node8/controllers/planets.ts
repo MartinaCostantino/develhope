@@ -1,32 +1,7 @@
 import express, { Request, Response } from 'express';
 import joi from 'joi';
-import pgPromise from 'pg-promise' ;
+import db from '../db';
 
-// const db = pgPromise()("postgres://postgres:postgres@localhost:5432/postgres");
-const dataBase = pgPromise();
-const db = dataBase({
-  host: "localhost",
-  port: 5432,
-  database: "postgres",
-  user: "postgres",
-  password: "postgres",
-});
- 
-const setupDatabase = async () => {
-  db.none(`
-    CREATE TABLE IF NOT EXISTS planets (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      image TEXT
-      );
-      `)
-      await db.none(`INSERT INTO planets (name) VALUES ('Earth')`)
-      await db.none(`INSERT INTO planets (name) VALUES ('Mars')`)
-    }
-    
-    setupDatabase().catch((error) => {
-      console.error('Error setting up database:', error);
-    });
 
 const planetSchema = joi.object({
    id: joi.number().integer().required(),
@@ -38,22 +13,22 @@ const getAll = async (req: Request, res: Response ) => {
   try{
     const planets = await db.any('SELECT * FROM planets');
     res.status(200).json({ planets });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
 
-const getOneById = async(req: Request, res: Response ) => {
+const getOneById = async(req: Request, res: Response ): Promise<any> => {
   const {id} = req.params;
   try{
   const planet = await db.one('SELECT * FROM planets WHERE id = $1', [Number(id)]);
   return res.status(200).json({ planet });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(404).json({ message: 'Planet not found', error: error.message})
     }  ;
 }
 
-const create = async (req: Request, res: Response) => {
+const create = async (req: Request, res: Response): Promise<any> => {
   const {name, id} = req.body;
   try{
   const planet = { id, name };
@@ -63,12 +38,12 @@ const create = async (req: Request, res: Response) => {
   }
   await db.none('INSERT INTO planets (name) VALUES ($1)', [name]);
     res.status(201).json({ planet });
-   } catch (error) {
+   } catch (error: any) {
     res.status(500).json({ message: 'Internal Server Error', error: error.message })
    }
 }
 
-const updateById = async (req: Request, res: Response) => {
+const updateById = async (req: Request, res: Response) : Promise<any> => {
   const { id } = req.params;
   const { name } = req.body;
   try{
@@ -78,16 +53,16 @@ const updateById = async (req: Request, res: Response) => {
   }
  await db.none('UPDATE planets SET name=$2 WHERE id=$1;', [id, name]);
   res.status(200).json({ message: 'Planet updated successfully' });
-} catch(error){
+} catch(error: any){
    res.status(500).json({ message: 'Internal Server Error', error: error.message }) 
 }
 }
-const deleteById =  async (req: Request, res: Response) => {
+const deleteById =  async (req: Request, res: Response) : Promise<any> => {
   const { id } = req.params;
  try {
    await db.none(`DELETE FROM planets WHERE id=$1`, [id]);
    return res.status(200).json({ message: 'Planet deleted successfully' });
- } catch (error) {
+ } catch (error: any) {
    res.status(404).json({ message: error.message });
  }
 }

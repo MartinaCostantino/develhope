@@ -4,6 +4,7 @@ import express from 'express';
 import { getAll, getOneById, create, updateById, deleteById, createImage } from './controllers/planets';
 import joi from 'joi';
 import multer from 'multer';
+import { register, login, authorize, logout } from './controllers/passport';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -32,6 +33,12 @@ app.put('/planets/:id', updateById )
 app.delete('/planets/:id', deleteById)
 
 app.post('/planets/upload/:id/image',upload.single("image") ,createImage)
+
+app.post('/signup', register)
+
+app.post('/login', login)
+
+app.get('/logout', authorize, logout);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
